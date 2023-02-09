@@ -1,4 +1,4 @@
-# Active Learning
+# Multi-source Active Learning for Natural Language Inference
 
 * **Note**: We intend to provide more comprehensive documentation soon.
 
