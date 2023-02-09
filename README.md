@@ -1,6 +1,6 @@
 # Active Learning
 
-* **Note**: We intend to provide a more comprehensively documented repository soon at https://github.com/asnijders/multi_source_AL.
+* **Note**: We intend to provide more comprehensive documentation soon.
 
 This repository contains the necessary code to run the experiments as presented in the paper "Investigating Multi-source Active Learning for Natural Language Inference".
 
