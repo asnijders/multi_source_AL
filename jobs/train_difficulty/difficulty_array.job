@@ -1,0 +1,71 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu_titanrtx_shared
+#SBATCH --gres=gpu:1
+#SBATCH --job-name=difficulty_test
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=3
+#SBATCH --time=01:00:00
+#SBATCH --mem=32000M
+#SBATCH --output=slurm/difficulty_array/output_%A_%a.out
+#SBATCH --array=1-5%5
+
+module purge
+module load 2021
+module load Anaconda3/2021.05
+
+cd $HOME/active_learning
+
+# copy all data from home folder to SCRATCH
+cp -r $HOME/active_learning/resources/. "$TMPDIR"
+# also copy acquisition ID data from previous run to SCRATCH
+cp -r $HOME/active_learning/results/. "$TMPDIR"
+
+# create folder on scratch disk to store output
+mkdir "$TMPDIR"/ard_output_dir_checkpoints
+
+HPARAMS_FILE=$HOME/active_learning/new_jobs/hparams/difficulty_hparams.txt
+
+# Your job starts in the directory where you call sbatch
+cd $HOME/active_learning
+# Activate your environment
+source activate active
+
+# Run your code
+srun python main.py \
+            --input_dir "$TMPDIR/ard_data" \
+            --output_dir "$TMPDIR/ard_output_dir_results" \
+            --checkpoint_dir "$TMPDIR/ard_output_dir_checkpoints" \
+            --project_dir="array" \
+            --array_uid="difficulty array job only easy medium" \
+            --model_id="roberta-large" \
+            --train_sets="SNLI_0.33333,ANLI_0.33333,WANLI_0.33333" \
+            --dev_sets="SNLI,ANLI,WANLI" \
+            --ood_sets="MNLI" \
+            --test_sets="SNLI,ANLI,WANLI,MNLI" \
+            --max_dev_size=2200 \
+            --seed_size=1.0 \
+            --max_train_size=4000 \
+            --downsample_rate=0.20 \
+            --labelling_batch_size=0 \
+            --al_iterations=0 \
+            --dropout=0.3 \
+            --mc_iterations=0 \
+            --lr=2e-5 \
+            --num_warmup_steps=200 \
+            --batch_size=8 \
+            --accumulate_grad_batches=4 \
+            --patience=10 \
+            --monitor="val_loss" \
+            --max_epochs=3 \
+            --val_check_interval=0.25 \
+            --num_workers=0 \
+            --progress_bar \
+            --precision=16 \
+            --log_every=1 \
+            --refresh_rate=25 \
+            --wanli_id_key="pairID" \
+            --acquisition_fn="random" \
+            $(head -$SLURM_ARRAY_TASK_ID $HPARAMS_FILE | tail -1)
+
+cp -r "$TMPDIR"/ard_output_dir_results $HOME/active_learning/results

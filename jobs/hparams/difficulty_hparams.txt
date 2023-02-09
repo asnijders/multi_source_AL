@@ -1,0 +1,5 @@
+--seed 42 --train_difficulty="hard_impossible"
+--seed 43 --train_difficulty="hard_impossible"
+--seed 44 --train_difficulty="hard_impossible"
+--seed 45 --train_difficulty="hard_impossible"
+--seed 46 --train_difficulty="hard_impossible"

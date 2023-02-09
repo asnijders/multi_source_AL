@@ -1,0 +1,67 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu_titanrtx_shared
+#SBATCH --gres=gpu:1
+#SBATCH --job-name=metrics_test
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=3
+#SBATCH --time=04:00:00
+#SBATCH --mem=32000M
+#SBATCH --output=slurm/datamap_test/output_%A.out
+
+module purge
+module load 2021
+module load Anaconda3/2021.05
+
+cd $HOME/active_learning
+
+# copy all data from home folder to SCRATCH
+cp -r $HOME/active_learning/resources/. "$TMPDIR"
+# also copy acquisition ID data from previous run to SCRATCH
+cp -r $HOME/active_learning/results/. "$TMPDIR"
+
+# create folder on scratch disk to store output
+mkdir "$TMPDIR"/ard_output_dir_checkpoints
+
+# Your job starts in the directory where you call sbatch
+cd $HOME/active_learning
+# Activate your environment
+source activate active
+
+# Run your code
+srun python main.py \
+            --input_dir "$TMPDIR/ard_data" \
+            --output_dir "$TMPDIR/ard_output_dir_results" \
+            --checkpoint_dir "$TMPDIR/ard_output_dir_checkpoints" \
+            --project_dir="test" \
+            --array_uid="test_datamap testje 1507 2" \
+            --test_datamap \
+            --model_id="roberta-large" \
+            --train_sets="SNLI_1.0,ANLI_1.0,WANLI_1.0" \
+            --dev_sets="SNLI,ANLI,WANLI,MNLI" \
+            --test_sets="SNLI,ANLI,WANLI,MNLI" \
+            --max_dev_size=2200\
+            --seed_size=1.0 \
+            --downsample_rate=0.20\
+            --labelling_batch_size=0 \
+            --al_iterations=0 \
+            --dropout=0.3 \
+            --mc_iterations=4 \
+            --lr=1e-6 \
+            --num_warmup_steps=0 \
+            --batch_size=8 \
+            --accumulate_grad_batches=12 \
+            --patience=5 \
+            --max_epochs=2 \
+            --monitor="val_loss" \
+            --val_check_interval=0.5 \
+            --num_workers=0 \
+            --progress_bar \
+            --precision=16 \
+            --log_every=1 \
+            --refresh_rate=25 \
+            --seed=42 \
+            --wanli_id_key="pairID" \
+            --acquisition_fn="random" \
+
+cp -r "$TMPDIR"/ard_output_dir_results $HOME/active_learning/results

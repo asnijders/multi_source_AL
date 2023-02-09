@@ -1,0 +1,5 @@
+--seed 42 --acquisition_fn=random
+--seed 42 --acquisition_fn=least-confidence
+--seed 42 --acquisition_fn=max-entropy
+--seed 42 --acquisition_fn=mc-max-entropy
+--seed 42 --acquisition_fn=bald
