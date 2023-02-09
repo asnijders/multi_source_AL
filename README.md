@@ -2,7 +2,7 @@
 
 * **Note**: We intend to provide more comprehensive documentation soon.
 
-This repository contains the necessary code to run the experiments as presented in the paper "Investigating Multi-source Active Learning for Natural Language Inference".
+This repository contains the necessary code to run the experiments as presented in the paper "Investigating Multi-source Active Learning for Natural Language Inference" by Ard Snijders, Douwe Kiela and Katerina Margatina, as accepted at the European Chapter of the Association of Computational Linguistics (EACL) 2023.
 
 For an overview of required dependencies, see:
 `resources/environment/requirements.txt`
